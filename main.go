@@ -2,27 +2,46 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	get_url_info, err := goquery.NewDocument("https://www.pref.aomori.lg.jp/soshiki/kenko/hoken/covid19-press.html")
-	if err != nil {
-		fmt.Println("cannot get HTML")
-	}
-	
+	// fmt.Println(mypkg.scraping())
+	err := godotenv.Load(fmt.Sprintf("./%s.env", os.Getenv("GO_ENV")))
+		Token_Me := os.Getenv("LINE_TOKEN_MINE")
+		// Token_F := os.Getenv("LINE_TOKEN_F")
+		// Token_Y := os.Getenv("LINE_TOKEN_Y")
+		// Token_N := os.Getenv("LINE_TOKEN_N")
+		// Token_GM := os.Getenv("LINE_TOKEN_GM")
 
-	result1 := get_url_info.Find("div.inner > table.bc > tbody > tr.textleft").First()
-	result1.Each(func(index int, s *goquery.Selection) {
-		tabledata := (s.Text())
-		day := strings.Split(tabledata, "\n")[1]
-		cases := strings.Split(tabledata, "\n")[3]
-		formated := strings.Replace(cases,"新型コロナウイルス感染症患者（","",1)
-		number := strings.Replace(formated, "例）を確認", "",1)
-		message := day + "公表" + "\n青森県新規感染者数 " + number + "人"
-		fmt.Println(message)
-	})
+		// accessToken_GM := Token_GM
+		accessToken_Me := Token_Me
+		msg := "message"
+		URL := "https://notify-api.line.me/api/notify"
+		u, err := url.ParseRequestURI(URL)
+		if err != nil {
+				log.Fatal(err)
+		}
+		c := &http.Client{}
+		form := url.Values{}
+		form.Add("message", msg)
+		body := strings.NewReader(form.Encode())
+		req, err := http.NewRequest("POST", u.String(), body)
+		if err != nil {
+				log.Fatal(err)
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		// req.Header.Set("Authorization", "Bearer "+ accessToken_GM)
+		req.Header.Set("Authorization", "Bearer "+ accessToken_Me)
 
+		_, err = c.Do(req)
+		if err != nil {
+				log.Fatal(err)
+		}
 }
