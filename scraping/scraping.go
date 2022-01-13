@@ -24,6 +24,6 @@ func scraping() {
 		number := strings.Replace(formated, "例）を確認", "",1)
 		message := "\n" + day + "公表" + "\n青森県新規感染者数 " + number + "人" + "\n詳細:https://www.pref.aomori.lg.jp/soshiki/kenko/hoken/covid19-press.html"
 		fmt.Println(message)
-		fmt.Println("message")
+		// return message
 	})
 }
